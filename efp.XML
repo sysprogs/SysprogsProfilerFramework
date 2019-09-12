@@ -1,0 +1,341 @@
+<?xml version="1.0"?>
+<EmbeddedFrameworkPackage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <PackageID>com.sysprogs.embedded.profiler</PackageID>
+  <PackageDescription>Embedded Profiler and Fast Semihosting</PackageDescription>
+  <PackageVersion>3.2</PackageVersion>
+  <DirectoryName>Profiler</DirectoryName>
+  <GNUTargetRegex>^arm-.*</GNUTargetRegex>
+  <MinimumEngineVersion>5.2</MinimumEngineVersion>
+  <Frameworks>
+    <EmbeddedFramework>
+      <ID>com.sysprogs.embedded.semihosting_and_profiler</ID>
+      <UserFriendlyName>Fast Semihosting and Embedded Profiler</UserFriendlyName>
+	  <ProjectFolderName>Semihosting/Profiler</ProjectFolderName>
+      <AdditionalSourceFiles>
+        <string>$$SYS:EFP_BASE$$/Profiler/FastSemihosting.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/SamplingProfiler.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/InstrumentingProfiler.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_HAL.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_StdPeriph.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Kinetis.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_FreeRTOS.c</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_RTX.c</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Nrf5x.cpp</string>
+      </AdditionalSourceFiles>
+      <AdditionalHeaderFiles>
+        <string>$$SYS:EFP_BASE$$/Profiler/SysprogsProfiler.h</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/SmallNumberCoder.h</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/SysprogsProfilerInterface.h</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerFreeRTOSHooks.h</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/CustomRealTimeWatches.h</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/DebuggerChecker.h</string>
+      </AdditionalHeaderFiles>
+	  <AdditionalIncludeDirs>
+		<string>$$SYS:EFP_BASE$$/Profiler</string>
+	  </AdditionalIncludeDirs>
+	  <AdditionalForcedIncludes>
+		<string>$$SYS:EFP_BASE$$/Profiler/ProfilerFreeRTOSHooks.h</string>
+	  </AdditionalForcedIncludes>
+	  <AdditionalPreprocessorMacros>
+		<string>FAST_SEMIHOSTING_BUFFER_SIZE=$$com.sysprogs.efp.semihosting.buffer_size$$</string>
+		<string>FAST_SEMIHOSTING_BLOCKING_MODE=$$com.sysprogs.efp.semihosting.blocking_mode$$</string>
+		<string>FAST_SEMIHOSTING_STDIO_DRIVER=$$com.sysprogs.efp.semihosting.stdio$$</string>
+		<string>FAST_SEMIHOSTING_PROFILER_DRIVER=$$com.sysprogs.efp.profiling.semihosting_driver$$</string>
+		<string>PROFILER_$$SYS:FAMILY_ID$$</string>
+		<string>$$com.sysprogs.efp.profiling.counter$$</string>
+		<string>$$com.sysprogs.efp.profiling.debugger_check$$</string>
+		<string>$$com.sysprogs.efp.profiling.address_validators$$</string>
+		<string>$$com.sysprogs.efp.profiling.rtos$$</string>
+	  </AdditionalPreprocessorMacros>
+      <ConfigurableProperties>
+        <PropertyGroups>
+          <PropertyGroup>
+		    <Name>Semihosting</Name>
+		    <UniqueID>com.sysprogs.efp.semihosting.</UniqueID>
+            <Properties>
+              <PropertyEntry xsi:type="Enumerated">
+                <Name>Buffer size</Name>
+                <UniqueID>buffer_size</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <SuggestionList>
+                  <Suggestion>
+                    <InternalValue>1024</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+                    <InternalValue>2048</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+                    <InternalValue>4096</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+                    <InternalValue>8192</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+                    <InternalValue>16384</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+                    <InternalValue>32768</InternalValue>
+                  </Suggestion>
+                </SuggestionList>
+                <DefaultEntryIndex>2</DefaultEntryIndex>
+                <AllowFreeEntry>true</AllowFreeEntry>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Boolean">
+                <Name>Redirect printf() to fast semihosting</Name>
+                <UniqueID>stdio</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <DefaultValue>true</DefaultValue>
+                <ValueForTrue>1</ValueForTrue>
+                <ValueForFalse>0</ValueForFalse>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Enumerated">
+                <Name>When out of buffer space</Name>
+                <UniqueID>blocking_mode</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <SuggestionList>
+                  <Suggestion>
+					<UserFriendlyName>Discard further data</UserFriendlyName>
+                    <InternalValue>0</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>Wait until the buffer becomes available</UserFriendlyName>
+                    <InternalValue>1</InternalValue>
+                  </Suggestion>
+                </SuggestionList>
+                <DefaultEntryIndex>1</DefaultEntryIndex>
+                <AllowFreeEntry>false</AllowFreeEntry>
+              </PropertyEntry>
+            </Properties>
+            <CollapsedByDefault>false</CollapsedByDefault>
+          </PropertyGroup>
+          <PropertyGroup>
+		    <Name>Profiler</Name>
+		    <UniqueID>com.sysprogs.efp.profiling.</UniqueID>
+            <Properties>
+              <PropertyEntry xsi:type="Enumerated">
+                <Name>Report profiling data via</Name>
+                <UniqueID>semihosting_driver</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <SuggestionList>
+                  <Suggestion>
+					<UserFriendlyName>Fast semihosting</UserFriendlyName>
+                    <InternalValue>1</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>Custom driver</UserFriendlyName>
+                    <InternalValue>0</InternalValue>
+                  </Suggestion>
+                </SuggestionList>
+                <DefaultEntryIndex>0</DefaultEntryIndex>
+                <AllowFreeEntry>false</AllowFreeEntry>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Boolean">
+                <Name>Use custom performance counter function</Name>
+                <UniqueID>counter</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <DefaultValue>false</DefaultValue>
+                <ValueForTrue>SYSPROGS_PROFILER_USE_DWT_CYCLE_COUNTER=0</ValueForTrue>
+                <ValueForFalse></ValueForFalse>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Boolean">
+                <Name>Provide custom address validation functions for sampling profiler</Name>
+                <UniqueID>address_validators</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <DefaultValue>false</DefaultValue>
+                <ValueForTrue>SYSPROGS_PROFILER_USE_CUSTOM_ADDRESS_VALIDATORS=1</ValueForTrue>
+                <ValueForFalse></ValueForFalse>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Boolean">
+                <Name>Exclude sampling profiler code</Name>
+                <UniqueID>nosampling</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <DefaultValue>false</DefaultValue>
+                <ValueForTrue>1</ValueForTrue>
+                <ValueForFalse>0</ValueForFalse>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Enumerated">
+                <Name>When running without debugger</Name>
+                <UniqueID>debugger_check</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <SuggestionList>
+                  <Suggestion>
+					<UserFriendlyName>Wait for debugger to attach</UserFriendlyName>
+                    <InternalValue></InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>Ignore profiling/semihosting calls</UserFriendlyName>
+                    <InternalValue>SYSPROGS_PROFILER_DEBUGGER_CHECK_MODE=1</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>Use a custom function to decide</UserFriendlyName>
+                    <InternalValue>SYSPROGS_PROFILER_DEBUGGER_CHECK_MODE=0</InternalValue>
+                  </Suggestion>
+                </SuggestionList>
+                <DefaultEntryIndex>0</DefaultEntryIndex>
+                <AllowFreeEntry>false</AllowFreeEntry>
+              </PropertyEntry>
+              <PropertyEntry xsi:type="Enumerated">
+                <Name>RTOS support</Name>
+                <UniqueID>rtos</UniqueID>
+                <OmitPrefixIfEmpty>false</OmitPrefixIfEmpty>
+                <SuggestionList>
+                  <Suggestion>
+					<UserFriendlyName>None</UserFriendlyName>
+                    <InternalValue></InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>FreeRTOS (auto)</UserFriendlyName>
+                    <InternalValue>USE_FREERTOS_IF_FOUND</InternalValue>
+                  </Suggestion>
+                  <Suggestion>
+					<UserFriendlyName>Keil RTX</UserFriendlyName>
+                    <InternalValue>USE_RTX</InternalValue>
+                  </Suggestion>
+                </SuggestionList>
+                <DefaultEntryIndex>1</DefaultEntryIndex>
+                <AllowFreeEntry>false</AllowFreeEntry>
+              </PropertyEntry>
+			</Properties>
+            <CollapsedByDefault>false</CollapsedByDefault>
+          </PropertyGroup>
+        </PropertyGroups>
+      </ConfigurableProperties>
+    </EmbeddedFramework>
+  </Frameworks>
+    <FileConditions>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="And">
+        <Arguments>
+		  <Condition xsi:type="Or">
+			<Arguments>
+			  <Condition xsi:type="ReferencesFramework">
+				<FrameworkID>com.sysprogs.arm.stm32.hal</FrameworkID>
+			  </Condition>
+			  <Condition xsi:type="MatchesRegex">
+				<Expression>$$SYS:FAMILY_ID$$</Expression>
+				<Regex>com.sysprogs.generated.keil.family.STM32.*</Regex>
+			  </Condition>
+			</Arguments>
+		  </Condition>
+          <Condition xsi:type="Not">
+			  <Argument xsi:type="Equals">
+				<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
+				<IgnoreCase>false</IgnoreCase>
+			  </Argument>
+          </Condition>
+        </Arguments>
+      </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_HAL.cpp</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="Equals">
+		<Expression>$$com.sysprogs.efp.profiling.rtos$$</Expression>
+		<ExpectedValue>USE_FREERTOS_IF_FOUND</ExpectedValue>
+		<IgnoreCase>false</IgnoreCase>
+	  </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_FreeRTOS.c</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="Equals">
+		<Expression>$$com.sysprogs.efp.profiling.rtos$$</Expression>
+		<ExpectedValue>USE_RTX</ExpectedValue>
+		<IgnoreCase>false</IgnoreCase>
+	  </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_RTX.c</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="Not">
+		  <Argument xsi:type="Equals">
+			<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+			<ExpectedValue>1</ExpectedValue>
+			<IgnoreCase>false</IgnoreCase>
+		  </Argument>
+	  </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/SamplingProfiler.cpp</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="And">
+        <Arguments>
+		  <Condition xsi:type="Or">
+			<Arguments>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.f0_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.f1_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.f2_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.f4_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.f7_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.l0_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.l1_stdperiph</FrameworkID>
+				</Condition>
+				<Condition xsi:type="ReferencesFramework">
+					<FrameworkID>com.sysprogs.arm.stm32.l4_stdperiph</FrameworkID>
+				</Condition>
+			</Arguments>
+		  </Condition>		
+          <Condition xsi:type="Not">
+			  <Argument xsi:type="Equals">
+				<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
+				<IgnoreCase>false</IgnoreCase>
+			  </Argument>
+          </Condition>
+        </Arguments>
+      </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_StdPeriph.cpp</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="And">
+        <Arguments>
+		  <Condition xsi:type="Equals">
+			<Expression>$$SYS:BSP_ID$$</Expression>
+			<ExpectedValue>com.sysprogs.arm.freescale.kinetis_ksdk</ExpectedValue>
+			<IgnoreCase>false</IgnoreCase>
+		  </Condition>
+          <Condition xsi:type="Not">
+			  <Argument xsi:type="Equals">
+				<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
+				<IgnoreCase>false</IgnoreCase>
+			  </Argument>
+          </Condition>
+        </Arguments>
+      </ConditionToInclude>	
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Kinetis.cpp</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="And">
+        <Arguments>
+		  <Condition xsi:type="Equals">
+			<Expression>$$SYS:BSP_ID$$</Expression>
+			<ExpectedValue>com.sysprogs.arm.nordic.nrf5x</ExpectedValue>
+			<IgnoreCase>false</IgnoreCase>
+		  </Condition>
+          <Condition xsi:type="Not">
+			  <Argument xsi:type="Equals">
+				<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
+				<IgnoreCase>false</IgnoreCase>
+			  </Argument>
+          </Condition>
+        </Arguments>
+      </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Nrf5x.cpp</FilePath>
+    </FileCondition>
+	</FileConditions>
+</EmbeddedFrameworkPackage>
