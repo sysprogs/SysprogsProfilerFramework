@@ -1,3 +1,4 @@
+#include "ProfilerCompatibility.h"
 #include "SysprogsProfilerInterface.h"
 #include <string.h>
 #include "DebuggerChecker.h"
@@ -834,6 +835,9 @@ extern "C" void __attribute__((weak)) InitializeProfilerRTOSHooks()
 {
 }
 
+extern "C" void __attribute__((weak)) InitializeProfilerRTOSHooksAfterReportingInitialization()
+{
+}
 extern "C" void __attribute__((noinline)) InitializeInstrumentingProfiler()
 {
 	if (!CanInvokeSemihostingCalls())
@@ -870,6 +874,7 @@ extern "C" void __attribute__((noinline)) InitializeInstrumentingProfiler()
 
 	g_SuppressInstrumentingProfiler = 0;
 	InstrumentingProfilerInitialized(x);
+	InitializeProfilerRTOSHooksAfterReportingInitialization();
 
 #ifdef SYSPROGS_PROFILER_NORDIC_INTERRUPT_WORKAROUND
 	{

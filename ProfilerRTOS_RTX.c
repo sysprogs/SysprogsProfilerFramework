@@ -1,3 +1,5 @@
+#include "ProfilerCompatibility.h"
+
 #ifdef USE_RTX
 #include "rtx_os.h"
 #include "SysprogsProfilerInterface.h"
@@ -40,6 +42,19 @@ void __attribute__((noinline)) SysprogsRTOSHooks_RTX_thread_switch_helper()
 {
 	g_SuppressInstrumentingProfiler++;
 	SysprogsProfiler_DoReportProfilerThreadSwitch(osRtxInfo.thread.run.next);
+
+	/*
+	 *	WARNING: if you are getting an "undefined reference to thread_switch_helper" error, please patch the RTX kernel as shown below:
+	 *		1. Locate the irq_XXXX.S assembly file (e.g. irq_cm4f.S)
+	 *		2. Locate the "SVC_ContextSwitch" label in it 
+	 *		3. Add the following code directly after the "STR R2,[R3]" instruction at the "SVC_ContextSwitch" label:
+	 *					PUSH {R2,R3}
+	 *					bl thread_switch_helper
+	 *					POP {R2,R3}
+ 	 *		4. Add an empty thread_swtich_helper() implementation in your main source file:
+ 	 *					extern "C" void thread_switch_helper() {}
+ 	 *		5. Now the profiler will be able to intercept the thread switch events and record call stacks properly.
+	 */
 	thread_switch_helper();
 	g_SuppressInstrumentingProfiler--;
 }
@@ -148,6 +163,13 @@ void InitializeProfilerRTOSHooks()
 		SysprogsRTOSHooks_RTX_thread_switch_helper();
 		SysprogsRTOSHooks_osRtxTick_Handler();
 	}
+}
+
+void InitializeProfilerRTOSHooksAfterReportingInitialization()
+{
+	//If we are using Live Variables, but not regular profiling, g_InstrumentingProfilerRTOSFlags will only be set after calling InstrumentingProfilerInitialized(),
+	//so we need to report the main thread again in order for it to get tracked.
+	SysprogsProfiler_DoReportProfilerThreadSwitch(osThreadGetId());
 }
 
 #else

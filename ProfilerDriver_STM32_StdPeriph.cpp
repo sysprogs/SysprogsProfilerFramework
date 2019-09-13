@@ -1,3 +1,5 @@
+#include "ProfilerCompatibility.h"
+
 #ifdef PROFILER_STM32F0
 #include <stm32f0xx_tim.h>
 #include <stm32f0xx_rcc.h>

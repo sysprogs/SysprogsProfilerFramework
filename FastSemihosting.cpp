@@ -6,6 +6,7 @@ int _write(int fd, char *pBuffer, int size);
 #include <string.h>
 #include "DebuggerChecker.h"
 #include "FastSemihosting.h"
+#include "ProfilerCompatibility.h"
 
 #ifdef __thumb__
 #define AngelSWI 0xAB
@@ -27,6 +28,15 @@ int _write(int fd, char *pBuffer, int size);
 
 #ifndef FAST_SEMIHOSTING_PROFILER_DRIVER
 #define FAST_SEMIHOSTING_PROFILER_DRIVER 1
+#endif
+
+#ifndef FAST_SEMIHOSTING_HOLD_INTERRUPTS
+#if defined(USE_FREERTOS) || defined(USE_RTX)
+#define FAST_SEMIHOSTING_HOLD_INTERRUPTS 1
+#else
+#define FAST_SEMIHOSTING_HOLD_INTERRUPTS 0
+#endif
+
 #endif
 
 static struct
@@ -141,7 +151,7 @@ static int WriteRawFastSemihostingData(const void *pBuffer, int size, int isChan
 
 int g_FastSemihostingCallActive;
 
-#ifdef USE_FREERTOS
+#if FAST_SEMIHOSTING_HOLD_INTERRUPTS
 __attribute__((always_inline)) static inline unsigned __get_PRIMASK(void)
 {
 	unsigned result;
@@ -172,7 +182,7 @@ int WriteToFastSemihostingChannel(unsigned char channel, const void *pBuffer, in
 	if (size == 0)
 		return 0;
 
-#ifdef USE_FREERTOS
+#if FAST_SEMIHOSTING_HOLD_INTERRUPTS
 	int interruptsDisabled = __get_PRIMASK();
 	__disable_irq();
 #endif
@@ -218,7 +228,7 @@ int WriteToFastSemihostingChannel(unsigned char channel, const void *pBuffer, in
 	} while (writeAll && done != size);
 
 	g_FastSemihostingCallActive--;
-#ifdef USE_FREERTOS
+#if FAST_SEMIHOSTING_HOLD_INTERRUPTS
 	if (!interruptsDisabled)
 		__enable_irq();
 #endif
@@ -254,7 +264,7 @@ int __attribute((weak)) SysprogsProfiler_WriteData(ProfilerDataChannel channel, 
 {
 	extern int g_FastSemihostingCallActive;
 
-#ifdef USE_FREERTOS
+#if FAST_SEMIHOSTING_HOLD_INTERRUPTS
 	int interruptsDisabled = __get_PRIMASK();
 	__disable_irq();
 #endif
@@ -277,7 +287,7 @@ int __attribute((weak)) SysprogsProfiler_WriteData(ProfilerDataChannel channel, 
 		result = headerSize + payloadSize;
 	}
 
-#ifdef USE_FREERTOS
+#if FAST_SEMIHOSTING_HOLD_INTERRUPTS
 	if (!interruptsDisabled)
 		__enable_irq();
 #endif

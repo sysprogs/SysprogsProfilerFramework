@@ -1,3 +1,4 @@
+#include "ProfilerCompatibility.h"
 #if defined(PROFILER_STM32F0) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32F0_Series)
 #include <stm32f0xx_hal.h>
 #include <stm32f0xx_hal_tim.h>
