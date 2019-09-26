@@ -2,7 +2,7 @@
 <EmbeddedFrameworkPackage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <PackageID>com.sysprogs.embedded.profiler</PackageID>
   <PackageDescription>Embedded Profiler and Fast Semihosting</PackageDescription>
-  <PackageVersion>3.3</PackageVersion>
+  <PackageVersion>3.4</PackageVersion>
   <DirectoryName>Profiler</DirectoryName>
   <GNUTargetRegex>^arm-.*</GNUTargetRegex>
   <MinimumEngineVersion>5.2</MinimumEngineVersion>
@@ -236,6 +236,10 @@
 			  <Condition xsi:type="MatchesRegex">
 				<Expression>$$SYS:FAMILY_ID$$</Expression>
 				<Regex>com.sysprogs.generated.keil.family.STM32.*</Regex>
+			  </Condition>
+			  <Condition xsi:type="Equals">
+				<Expression>$$MBED:TARGET_STM$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
 			  </Condition>
 			</Arguments>
 		  </Condition>

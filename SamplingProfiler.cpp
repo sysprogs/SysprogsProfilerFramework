@@ -53,6 +53,18 @@ extern "C" {
 int IsValidCodeAddress(void *pAddr);
 int IsValidStackAddress(void **pStackSlot);
 }
+#elif defined (__MBED__)
+static inline int IsValidCodeAddress(void *pAddr)
+{
+	extern void *__etext;
+	return (pAddr >= (void *)MBED_ROM_START && pAddr <= (void *)&__etext);
+}
+
+static inline int IsValidStackAddress(void **pStackSlot)
+{
+	extern void *_sdata;
+	return pStackSlot >= &_sdata && pStackSlot < (void *)(SYSPROGS_PROFILER_END_OF_RAM);
+}
 #else
 static inline int IsValidCodeAddress(void *pAddr)
 {
