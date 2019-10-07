@@ -65,8 +65,14 @@ static void InitializeFastSemihosting()
 	void *pSemihostingStruct = &s_FastSemihostingState;
 	(void)pSemihostingStruct;
 	s_FastSemihostingState.ReadOffset = sizeof(s_FastSemihostingState.Data);
+#ifdef __IAR_SYSTEMS_ICC__
+	asm volatile("mov r0, %0" :: "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting));
+	asm volatile("mov r1, %0" :: "r"(&s_FastSemihostingState));
+	asm volatile("bkpt 0xAB" :: : "r0", "r1", "r2", "r3", "lr", "memory", "cc");
+#else
 	asm volatile("mov r0, %1; mov r1, %0; bkpt %a2" ::"r"(&s_FastSemihostingState), "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting), "i"(AngelSWI)
 				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
+#endif
 	s_FastSemihostingState.ReadOffset = 0;
 	s_FastSemihostingState.WriteOffset = 0;
 }
@@ -241,7 +247,11 @@ int _isatty()
 	return 1;
 }
 
+#ifdef __IAR_SYSTEMS_ICC__
+extern "C" size_t __write(int fd, const unsigned char *pBuffer, size_t size) 
+#else
 int _write(int fd, char *pBuffer, int size)
+#endif
 {
 	WriteToFastSemihostingChannel(fd & 0x0f, (const void *)pBuffer, size, FAST_SEMIHOSTING_BLOCKING_MODE);
 	//If we return less than [size], the newlib will retry the write call for the remaining bytes.
@@ -302,6 +312,8 @@ int SysprogsProfiler_GetBufferAvailability(unsigned exp)
 
 #endif
 
+#ifndef __IAR_SYSTEMS_ICC__
+
 void __attribute__((noinline)) SuspendFastSemihostingPolling()
 {
 	if (!CanInvokeSemihostingCalls())
@@ -319,3 +331,5 @@ void __attribute__((noinline)) ResumeFastSemihostingPolling()
 	asm volatile("mov r0, %1; mov r1, %0; bkpt %a2" ::"r"(1), "r"(SysprogsSemihostingReasonBase + kControlFastSemihostingPolling), "i"(AngelSWI)
 				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
 }
+
+#endif

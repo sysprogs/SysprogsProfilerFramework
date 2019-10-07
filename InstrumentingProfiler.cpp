@@ -3,6 +3,8 @@
 #include <string.h>
 #include "DebuggerChecker.h"
 
+#ifndef __IAR_SYSTEMS_ICC__
+
 typedef unsigned long long ProfilerTimeType;
 
 typedef unsigned uintptr_t;
@@ -183,12 +185,12 @@ namespace SysprogsInstrumentingProfiler
 
 		bool IsReported() const
 		{
-			return FunctionAndReportFlag & (1 << 31);
+			return FunctionAndReportFlag & (1U << 31);
 		}
 
 		void FlagAsReported() const
 		{
-			const_cast<InstrumentedFrame *>(this)->FunctionAndReportFlag |= (1 << 31);
+			const_cast<InstrumentedFrame *>(this)->FunctionAndReportFlag |= (1U << 31);
 		}
 	};
 
@@ -914,3 +916,5 @@ extern "C" void InitializeCustomRealTimeWatch()
 	char rec = (char)rtpInitialization;
 	SysprogsProfiler_WriteData(pdcRealTimeAnalysisStream, &rec, 1, 0, 0);
 }
+
+#endif
