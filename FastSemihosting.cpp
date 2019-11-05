@@ -60,8 +60,10 @@ enum
 	kControlFastSemihostingPolling
 };
 
-static void InitializeFastSemihosting()
+void InitializeFastSemihosting()
 {
+	s_FastSemihostingInitialized = true;
+
 	void *pSemihostingStruct = &s_FastSemihostingState;
 	(void)pSemihostingStruct;
 	s_FastSemihostingState.ReadOffset = sizeof(s_FastSemihostingState.Data);
@@ -93,7 +95,6 @@ static int WriteRawFastSemihostingData(const void *pBuffer, int size, int isChan
 
 	if (!s_FastSemihostingInitialized)
 	{
-		s_FastSemihostingInitialized = true;
 		InitializeFastSemihosting();
 	}
 
