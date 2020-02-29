@@ -2,7 +2,7 @@
 <EmbeddedFrameworkPackage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <PackageID>com.sysprogs.embedded.profiler</PackageID>
   <PackageDescription>Embedded Profiler and Fast Semihosting</PackageDescription>
-  <PackageVersion>3.5</PackageVersion>
+  <PackageVersion>4.0</PackageVersion>
   <DirectoryName>Profiler</DirectoryName>
   <GNUTargetRegex>^arm-.*</GNUTargetRegex>
   <MinimumEngineVersion>5.2</MinimumEngineVersion>
@@ -15,6 +15,7 @@
         <string>$$SYS:EFP_BASE$$/Profiler/FastSemihosting.cpp</string>
         <string>$$SYS:EFP_BASE$$/Profiler/SamplingProfiler.cpp</string>
         <string>$$SYS:EFP_BASE$$/Profiler/InstrumentingProfiler.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/TestResourceManager.cpp</string>
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_HAL.cpp</string>
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_STM32_StdPeriph.cpp</string>
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Kinetis.cpp</string>

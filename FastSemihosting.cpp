@@ -333,4 +333,14 @@ void __attribute__((noinline)) ResumeFastSemihostingPolling()
 				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
 }
 
+void RequestBlockingProcessingViaFastSemihosting()
+{
+	s_FastSemihostingState.WriteOffset |= 0x80000000;
+
+	while (s_FastSemihostingState.WriteOffset & 0x80000000)
+	{
+		//Waiting for the host to acknowledge the call.
+	}
+}
+
 #endif

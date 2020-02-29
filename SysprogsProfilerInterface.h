@@ -6,7 +6,8 @@ typedef enum
 	pdcInstrumentationProfilerStreamDeprecated = 0x42, //Old protocol that does not support RTOS extensions
 	pdcTestReportStream = 0x43,
 	pdcRealTimeAnalysisStream = 0x44,
-	pdcInstrumentationProfilerNormalStream = 0x45
+	pdcInstrumentationProfilerNormalStream = 0x45,
+	pdcResourceManagementStream = 0x46,
 } ProfilerDataChannel;
 
 typedef enum

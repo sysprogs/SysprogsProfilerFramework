@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SemihostingResourceManagerTests", "SemihostingResourceManagerTests\SemihostingResourceManagerTests.vcxproj", "{07D0C634-855F-4441-A5C3-7A0332BD2B03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|VisualGDB = Debug|VisualGDB
+		Release|VisualGDB = Release|VisualGDB
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07D0C634-855F-4441-A5C3-7A0332BD2B03}.Debug|VisualGDB.ActiveCfg = Debug|VisualGDB
+		{07D0C634-855F-4441-A5C3-7A0332BD2B03}.Debug|VisualGDB.Build.0 = Debug|VisualGDB
+		{07D0C634-855F-4441-A5C3-7A0332BD2B03}.Release|VisualGDB.ActiveCfg = Release|VisualGDB
+		{07D0C634-855F-4441-A5C3-7A0332BD2B03}.Release|VisualGDB.Build.0 = Release|VisualGDB
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F5EB29A-63FF-4081-ACBE-071D8D6494E8}
+	EndGlobalSection
+EndGlobal
