@@ -233,7 +233,7 @@ TRMErrorCode TRMEndReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size
 	return trmSuccess;
 }
 
-size_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, int allowPartialReads)
+ssize_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, int allowPartialReads)
 {
 	char *pAdjustedBuffer = (char *)pBuffer;
 	size_t done = 0;
@@ -275,9 +275,7 @@ TRMErrorCode TRMEndWriteBurst(TRMWriteBurstHandle hBurst)
 	return (TRMErrorCode)s_FastSemihostingStateExtension.Arguments[0];
 }
 
-int WriteToFastSemihostingChannel(unsigned char channel, const void *pBuffer, int size, int writeAll);
-
-size_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t size)
+ssize_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t size)
 {
 	unsigned request[3] = {nbrrProcessWriteBurstData, (unsigned)hBurst, size};
 	if (WriteToFastSemihostingChannel(pdcResourceManagementStream, &request, sizeof(request), 1) != sizeof(request))

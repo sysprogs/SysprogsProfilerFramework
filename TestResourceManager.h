@@ -213,7 +213,7 @@ TRMErrorCode TRMCreateDirectory(const char *pDirName);
 TRMErrorCode TRMDeleteDirectory(const char *pDirName, int recursively);
 
 //! Starts a read burst.
-/*! This function starts a read burst (i.e. background prefetch) using supplied temporary buffer. See \ref TRM_ReadBursts for more details.
+/*! This function starts a read burst (i.e. background prefetch) using the supplied temporary buffer. See \ref TRM_ReadBursts for more details.
 	Once a burst has been started, use \ref TRMReadFileCached to read the data from the file.
 	\param hFile File handle returned by \ref TRMCreateFile.
 	\param pWorkArea Temporary buffer that will be used to prefetch the data from the host. The buffer must be at least 16 bytes long (although 4096KB or more is recommended for optimal performance).
@@ -266,12 +266,42 @@ void *TRMBeginReadFileCached(TRMReadBurstHandle hBurst, size_t *pSize, int waitF
 TRMErrorCode TRMEndReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size);
 
 //! Reads data within a read burst.
-size_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, int allowPartialReads);
+/*! This function reads a portion of data within a read burst into the supplied buffer.
+	Because the read bursts involve prefetching the data into a temporary buffer (see \ref TRMBeginReadBurst), calling this function involves an unnecessary copying of data
+	between the temporary buffer and the final buffer. If you would like to avoid it, use the \ref TRMBeginReadFileCached/\ref TRMEndReadFileCached instead.
+	
+	\param hBurst Burst handle returned by \ref TRMBeginReadBurst
+	\param pBuffer Buffer that will receive the data
+	\param size Maximum amount of bytes to read
+	\param allowPartialReads Specifies whether the function can return if some, but not all of the data has been read (similar to the socket API).
+	
+	\return If the function succeeds, it returns the number of bytes read from the file. Unless <b>allowPartialReads</b> was set to 1, an end-of-file or an error has been encountered,
+			it will be equal to the <b>size</b> parameter. If the function fails, the return value is zero or negative.
+*/
+ssize_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, int allowPartialReads);
 
+//! Starts a read burst.
+/*! This function starts a write burst (i.e. series of cached non-blocking writes) using the fast semihosting buffer. See \ref TRM_WriteBursts for more details.
+	Once a burst has been started, use \ref TRMWriteFileCached to write the data to  the file.
+	\param hFile File handle returned by \ref TRMCreateFile.
+	
+	\remarks Once the burst has been started, regular file API will not work for the file. Use \ref TRMEndWriteBurst to end the burst.
+			 Each file can only have one burst operation active at once, however multiple files can have active bursts at the same time.
+*/
 TRMWriteBurstHandle TRMBeginWriteBurst(TRMFileHandle hFile);
+
+//! Ends a write burst.
+/*! \param hBurst Burst handle returned by \ref TRMBeginWriteBurst */
 TRMErrorCode TRMEndWriteBurst(TRMWriteBurstHandle hBurst);
 
-size_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t size);
+//! Writes data within a write burst.
+/*! This function writes data to a file on the host within a write burst. As long as the fast semihosting buffer has sufficient space, the function will return immediately,
+	letting the target run more code, while VisualGDB is processing the data in the background.
+	\param hBurst Burst handle returned by \ref TRMBeginWriteBurst.
+	\param pBuffer Buffer that contains the data.
+	\param size The maximum number of bytes that should be written to the file.
+*/
+ssize_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t size);
 
 #ifdef __cplusplus
 }

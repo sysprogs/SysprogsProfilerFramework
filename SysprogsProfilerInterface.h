@@ -23,6 +23,7 @@ extern "C" {
 int SysprogsProfiler_WriteData(ProfilerDataChannel channel, const void *pHeader, unsigned headerSize, const void *pPayload, unsigned payloadSize);
 int SysprogsProfiler_GetBufferAvailability(unsigned exp); //Returns (1 << exp) if the buffer is fully available, 0 if fully used, -1 if not supported
 
+//! Returns the amount of profiler clock ticks passed since the last call to this function.
 unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter();
 
 void SysprogsProfiler_RTOSThreadSwitched(void *newThread, const char *pThreadName, void *pStackLimit);
