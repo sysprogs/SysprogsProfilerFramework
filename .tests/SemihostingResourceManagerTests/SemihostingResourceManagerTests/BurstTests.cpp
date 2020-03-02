@@ -49,7 +49,7 @@ TEST(BurstTests, ReadBurstTest)
 	position = TRMSeekFile(hFile, SEEK_SET, 0);
 	CHECK_EQUAL(0, position);
 
-	auto hBurst = TRMBeginCachedRead(hFile, burstBuffer, sizeof(burstBuffer));
+	auto hBurst = TRMBeginReadBurst(hFile, burstBuffer, sizeof(burstBuffer));
 	CHECK(hBurst != 0);
 
 	srand(123);
@@ -75,7 +75,7 @@ TEST(BurstTests, ReadBurstTest)
 	}
 
 	printf("Cached read of %d KB completed in %d ticks\r\n", (blockCount * sizeof(blockBuffer)) / 1024, (uint32_t)(HAL_GetTick() - start));
-	TRMErrorCode err = TRMEndCachedRead(hBurst);
+	TRMErrorCode err = TRMEndReadBurst(hBurst);
 	CHECK_EQUAL(trmSuccess, err);
 	
 	TRMCloseFile(hFile);
@@ -90,7 +90,7 @@ TEST(BurstTests, WriteBurstTest)
 	TRMFileHandle hFile = TRMCreateFile("WriteBurstTest.dat", sfmCreateOrTruncateReadWrite);
 	CHECK(hFile != 0);
 
-	auto hBurst = TRMBeginCachedWrite(hFile);
+	auto hBurst = TRMBeginWriteBurst(hFile);
 	CHECK(hBurst != 0);
 
 	uint32_t start = HAL_GetTick();
@@ -107,7 +107,7 @@ TEST(BurstTests, WriteBurstTest)
 	printf("Cached write of %d KB completed in %d ticks\r\n", (blockCount * sizeof(blockBuffer)) / 1024, (uint32_t)(HAL_GetTick() - start));
 	start = HAL_GetTick();
 
-	TRMErrorCode err = TRMEndCachedWrite(hBurst);
+	TRMErrorCode err = TRMEndWriteBurst(hBurst);
 	CHECK_EQUAL(trmSuccess, err);
 
 	uint64_t position = TRMSeekFile(hFile, SEEK_SET, 0);

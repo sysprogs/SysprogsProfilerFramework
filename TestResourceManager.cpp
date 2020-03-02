@@ -8,8 +8,8 @@ static volatile bool s_BlockingFastSemihostingInitialized;
 
 enum NonBlockingResourceRequest
 {
-	nbrrInitialize,				//Payload: &s_BlockingFastSemihostingInitialized, &s_FastSemihostingStateExtension
-	nbrrProcessWriteBurstData,	//Payload: <burst handle> <data size> <data>
+	nbrrInitialize,			   //Payload: &s_BlockingFastSemihostingInitialized, &s_FastSemihostingStateExtension
+	nbrrProcessWriteBurstData, //Payload: <burst handle> <data size> <data>
 };
 
 enum BlockingResourceRequest
@@ -79,13 +79,13 @@ void TRMCloseFile(TRMFileHandle hFile)
 	RunBlockingFastSemihostingCall(brrCloseFile, (unsigned)hFile);
 }
 
-size_t TRMReadFile(TRMFileHandle hFile, void *pBuffer, size_t size)
+ssize_t TRMReadFile(TRMFileHandle hFile, void *pBuffer, size_t size)
 {
 	RunBlockingFastSemihostingCall(brrReadFile, (unsigned)hFile, (unsigned)pBuffer, size);
 	return s_FastSemihostingStateExtension.Arguments[0];
 }
 
-size_t TRMWriteFile(TRMFileHandle hFile, void *pBuffer, size_t size)
+ssize_t TRMWriteFile(TRMFileHandle hFile, const void *pBuffer, size_t size)
 {
 	RunBlockingFastSemihostingCall(brrWriteFile, (unsigned)hFile, (unsigned)pBuffer, size);
 	return s_FastSemihostingStateExtension.Arguments[0];
@@ -133,7 +133,7 @@ struct ReadBurstWorkArea
 	volatile uint32_t BufferSize;
 };
 
-TRMReadBurstHandle TRMBeginCachedRead(TRMFileHandle hFile, void *pWorkArea, size_t workAreaSize)
+TRMReadBurstHandle TRMBeginReadBurst(TRMFileHandle hFile, void *pWorkArea, size_t workAreaSize)
 {
 	int frontPadding = (unsigned)pWorkArea % sizeof(void *);
 	if (frontPadding)
@@ -154,7 +154,7 @@ TRMReadBurstHandle TRMBeginCachedRead(TRMFileHandle hFile, void *pWorkArea, size
 		return (TRMReadBurstHandle)pWorkAreaStructure;
 }
 
-TRMErrorCode TRMEndCachedRead(TRMReadBurstHandle hBurst)
+TRMErrorCode TRMEndReadBurst(TRMReadBurstHandle hBurst)
 {
 	RunBlockingFastSemihostingCall(brrEndCachedRead, (unsigned)hBurst);
 	return (TRMErrorCode)s_FastSemihostingStateExtension.Arguments[0];
@@ -180,10 +180,16 @@ void *TRMBeginReadFileCached(TRMReadBurstHandle hBurst, size_t *pSize, int waitF
 			break; //We have more data to read.
 
 		if (writeOffsetWithFlags & kReadBurstEOFFlag)
-			return 0;	//No more data available on host.
+		{
+			*pSize = 0;
+			return 0; //No more data available on host.
+		}
 
 		if (!waitForData)
-			return 0;	//Non-blocking mode requested.
+		{
+			*pSize = 0;
+			return 0; //Non-blocking mode requested.
+		}
 	}
 
 	unsigned readOffset = readOffsetWithGenerationBit & kReadBurstOffsetMask;
@@ -195,9 +201,7 @@ void *TRMBeginReadFileCached(TRMReadBurstHandle hBurst, size_t *pSize, int waitF
 	else
 		availableSize = pWorkAreaStructure->BufferSize - readOffset;
 
-	if (*pSize > availableSize)
-		*pSize = availableSize;
-
+	*pSize = availableSize;
 	return (char *)(pWorkAreaStructure + 1) + readOffset;
 }
 
@@ -236,10 +240,13 @@ size_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, 
 
 	while (done < size)
 	{
-		size_t todo = size - done;
+		size_t maxTodo = size - done, todo = 0;
 		void *pData = TRMBeginReadFileCached(hBurst, &todo, 1);
 		if (!pData || !todo)
 			break;
+
+		if (todo > maxTodo)
+			todo = maxTodo;
 
 		memcpy(pAdjustedBuffer, pData, todo);
 		TRMErrorCode err = TRMEndReadFileCached(hBurst, pData, todo);
@@ -256,13 +263,13 @@ size_t TRMReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size, 
 	return done;
 }
 
-TRMWriteBurstHandle TRMBeginCachedWrite(TRMFileHandle hFile)
+TRMWriteBurstHandle TRMBeginWriteBurst(TRMFileHandle hFile)
 {
 	RunBlockingFastSemihostingCall(brrBeginCachedWrite, (unsigned)hFile);
 	return (TRMWriteBurstHandle)s_FastSemihostingStateExtension.Arguments[0];
 }
 
-TRMErrorCode TRMEndCachedWrite(TRMWriteBurstHandle hBurst)
+TRMErrorCode TRMEndWriteBurst(TRMWriteBurstHandle hBurst)
 {
 	RunBlockingFastSemihostingCall(brrEndCachedWrite, (unsigned)hBurst);
 	return (TRMErrorCode)s_FastSemihostingStateExtension.Arguments[0];
@@ -272,7 +279,7 @@ int WriteToFastSemihostingChannel(unsigned char channel, const void *pBuffer, in
 
 size_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t size)
 {
-	unsigned request[3] = {nbrrProcessWriteBurstData, (unsigned)hBurst, size };
+	unsigned request[3] = {nbrrProcessWriteBurstData, (unsigned)hBurst, size};
 	if (WriteToFastSemihostingChannel(pdcResourceManagementStream, &request, sizeof(request), 1) != sizeof(request))
 		return 0;
 
