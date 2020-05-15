@@ -2,7 +2,12 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#ifdef __ARMCC_VERSION
+typedef int ssize_t;
+#else
 #include <memory.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

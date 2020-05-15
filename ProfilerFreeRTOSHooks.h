@@ -1,6 +1,7 @@
 #pragma once
 
 #ifndef __ASSEMBLER__
+#ifndef DISABLE_SYSPROGS_FREERTOS_HOOKS
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,4 +22,5 @@ void SysprogsRTOSHooks_FreeRTOS_traceQUEUE_RECEIVE(void *pQueue);
 }
 #endif
 
+#endif
 #endif
