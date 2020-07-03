@@ -60,6 +60,15 @@ enum
 	kControlFastSemihostingPolling
 };
 
+#ifdef __ARMCC_VERSION
+static void __attribute__((noinline)) RunSemihostingCall(int r0, int r1)
+{
+	//ARMCC does not allow changing the r0/r1 values using the inline assembly syntax and instead redirects them to other registers.
+	//Moving the semihosting call to a separate function solves the problem.
+	__asm("bkpt 0xab");
+}
+#endif
+
 void InitializeFastSemihosting()
 {
 	s_FastSemihostingInitialized = true;
@@ -71,6 +80,8 @@ void InitializeFastSemihosting()
 	asm volatile("mov r0, %0" :: "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting));
 	asm volatile("mov r1, %0" :: "r"(&s_FastSemihostingState));
 	asm volatile("bkpt 0xAB" :: : "r0", "r1", "r2", "r3", "lr", "memory", "cc");
+#elif defined(__ARMCC_VERSION)
+	RunSemihostingCall(SysprogsSemihostingReasonBase + kInitializeFastSemihosting, (int)&s_FastSemihostingState);
 #else
 	asm volatile("mov r0, %1; mov r1, %0; bkpt %a2" ::"r"(&s_FastSemihostingState), "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting), "i"(AngelSWI)
 				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
@@ -313,7 +324,7 @@ int SysprogsProfiler_GetBufferAvailability(unsigned exp)
 
 #endif
 
-#ifndef __IAR_SYSTEMS_ICC__
+#if !defined(__IAR_SYSTEMS_ICC__) && !defined(__CC_ARM)
 
 void __attribute__((noinline)) SuspendFastSemihostingPolling()
 {
@@ -333,6 +344,8 @@ void __attribute__((noinline)) ResumeFastSemihostingPolling()
 				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
 }
 
+#endif
+
 void RequestBlockingProcessingViaFastSemihosting()
 {
 	s_FastSemihostingState.WriteOffset |= 0x80000000;
@@ -342,5 +355,3 @@ void RequestBlockingProcessingViaFastSemihosting()
 		//Waiting for the host to acknowledge the call.
 	}
 }
-
-#endif

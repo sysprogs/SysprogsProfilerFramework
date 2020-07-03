@@ -2,7 +2,7 @@
 <EmbeddedFrameworkPackage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <PackageID>com.sysprogs.embedded.profiler</PackageID>
   <PackageDescription>Embedded Profiler and Fast Semihosting</PackageDescription>
-  <PackageVersion>4.1</PackageVersion>
+  <PackageVersion>4.3</PackageVersion>
   <DirectoryName>Profiler</DirectoryName>
   <GNUTargetRegex>^arm-.*</GNUTargetRegex>
   <MinimumEngineVersion>5.2</MinimumEngineVersion>

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "DebuggerChecker.h"
 
-#ifndef __IAR_SYSTEMS_ICC__
+#if !defined(__IAR_SYSTEMS_ICC__) && !defined(__CC_ARM)
 
 typedef unsigned long long ProfilerTimeType;
 
