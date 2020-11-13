@@ -166,6 +166,15 @@ void TRMCloseFile(TRMFileHandle hFile);
 */
 ssize_t TRMReadFile(TRMFileHandle hFile, void *pBuffer, size_t size);
 
+//! Reads the user input from the Fast Semihosting window.
+/*!
+	\param pBuffer Buffer that will receive the data.
+	\param size The maximum number of bytes that should be read from the file.
+	\param blocking Specifies whether the call should wait for at least 1 byte to be available.
+	\return The function returns the number of bytes read from the stdin.
+*/
+ssize_t TRMReadStdin(void *pBuffer, size_t size, int blocking);
+
 //! Write the data to a file on the host machine.
 /*!
 	\param hFile File handle returned by \ref TRMCreateFile.

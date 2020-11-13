@@ -31,6 +31,8 @@ enum BlockingResourceRequest
 	brrEndCachedRead,
 	brrBeginCachedWrite,
 	brrEndCachedWrite,
+	
+	brrReadStdin,
 };
 
 static struct
@@ -88,6 +90,12 @@ ssize_t TRMReadFile(TRMFileHandle hFile, void *pBuffer, size_t size)
 ssize_t TRMWriteFile(TRMFileHandle hFile, const void *pBuffer, size_t size)
 {
 	RunBlockingFastSemihostingCall(brrWriteFile, (unsigned)hFile, (unsigned)pBuffer, size);
+	return s_FastSemihostingStateExtension.Arguments[0];
+}
+
+ssize_t TRMReadStdin(void *pBuffer, size_t size, int blocking)
+{
+	RunBlockingFastSemihostingCall(brrReadStdin, blocking, (unsigned)pBuffer, size);
 	return s_FastSemihostingStateExtension.Arguments[0];
 }
 
@@ -283,3 +291,15 @@ ssize_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t
 
 	return WriteToFastSemihostingChannel(pdcResourceManagementStream, pData, size, 1);
 }
+
+#if FAST_SEMIHOSTING_STDIO_DRIVER
+
+#ifdef __IAR_SYSTEMS_ICC__
+extern "C" size_t __read(int fd, const unsigned char *pBuffer, size_t size)
+#else
+extern "C" int _read(int fd, char *pBuffer, int size)
+#endif
+{
+	return TRMReadStdin((void *)pBuffer, size, 1);
+}
+#endif
