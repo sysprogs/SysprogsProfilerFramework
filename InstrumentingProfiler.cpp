@@ -73,12 +73,19 @@ static unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter()
 {
 #define DWT_CYCCNT (*((unsigned *)0xE0001004))
 #define DWT_CTRL (*((unsigned *)0xE0001000))
+#define DWT_LAR (*((unsigned *)0xE0001FB0))
+#define DWT_LSR (*((unsigned *)0xE0001FB4))
 #define COREDEBUG_DEMCR (*((unsigned *)0xe000edfc))
 
 	static int Initialized = 0;
 	if (!Initialized)
 	{
 		COREDEBUG_DEMCR |= 0x01000000;
+#ifdef PROFILER_STM32F7
+		if (DWT_LSR & 1)
+			DWT_LAR = 0xC5ACCE55;
+#endif
+		
 		DWT_CTRL = 1;
 		DWT_CYCCNT = 0;
 		Initialized = 1;
