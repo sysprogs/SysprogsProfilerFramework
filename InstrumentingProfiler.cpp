@@ -69,6 +69,27 @@ InstrumentingProfilerFlags g_InstrumentingProfilerRTOSFlags;
 //and provide your own implementation of this (e.g. using some hardware timer)
 #if !defined(SYSPROGS_PROFILER_USE_DWT_CYCLE_COUNTER) || SYSPROGS_PROFILER_USE_DWT_CYCLE_COUNTER
 #define SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter_Inline
+#ifdef PROFILER_RP2040
+
+#include <hardware/timer.h>
+
+/* RP2040 does not support reading the DWT cycle counter register programmatically, and the hardware PWM units only have 16-bit precision.
+ * Hence, we use the system timer hardware to count function run times. It does not offer cycle-level accuracy, however, should be sufficient
+ * for most uses.
+ * 
+ * For cycle-level accuracy, consider creating a custom implementation of this function based on the PWM or PIO hardware.
+ */
+static unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter()
+{
+	uint32_t high = timer_hw->timehr;
+	uint32_t low = timer_hw->timelr;
+	uint64_t value = (((uint64_t)high) << 32) | low;
+	static uint64_t offset = 0;
+	uint64_t result = value - offset;
+	offset = value;
+	return result;
+}
+#else
 static unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter()
 {
 #define DWT_CYCCNT (*((unsigned *)0xE0001004))
@@ -95,6 +116,7 @@ static unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter()
 	DWT_CYCCNT = 0;
 	return result;
 }
+#endif
 #else
 extern "C" unsigned SysprogsInstrumentingProfiler_QueryAndResetPerformanceCounter();
 #endif

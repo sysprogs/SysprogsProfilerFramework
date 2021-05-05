@@ -253,7 +253,7 @@ int WriteToFastSemihostingChannel(unsigned char channel, const void *pBuffer, in
 	return done;
 }
 
-#if FAST_SEMIHOSTING_STDIO_DRIVER
+#if FAST_SEMIHOSTING_STDIO_DRIVER && !defined(PROFILER_RP2040)
 int _isatty()
 {
 	return 1;

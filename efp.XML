@@ -10,6 +10,7 @@
     <EmbeddedFramework>
       <ID>com.sysprogs.embedded.semihosting_and_profiler</ID>
       <UserFriendlyName>Fast Semihosting and Embedded Profiler</UserFriendlyName>
+	  <ShortUniqueName>Profiler</ShortUniqueName>
 	  <ProjectFolderName>Semihosting/Profiler</ProjectFolderName>
       <AdditionalSourceFiles>
         <string>$$SYS:EFP_BASE$$/Profiler/FastSemihosting.cpp</string>
@@ -22,6 +23,7 @@
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_FreeRTOS.c</string>
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerRTOS_RTX.c</string>
         <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Nrf5x.cpp</string>
+        <string>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_RP2040.cpp</string>
       </AdditionalSourceFiles>
       <AdditionalHeaderFiles>
         <string>$$SYS:EFP_BASE$$/Profiler/SysprogsProfiler.h</string>
@@ -363,6 +365,25 @@
         </Arguments>
       </ConditionToInclude>
       <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_Nrf5x.cpp</FilePath>
+    </FileCondition>
+    <FileCondition>
+	  <ConditionToInclude xsi:type="And">
+        <Arguments>
+		  <Condition xsi:type="Equals">
+			<Expression>$$SYS:FAMILY_ID$$</Expression>
+			<ExpectedValue>RP2040</ExpectedValue>
+			<IgnoreCase>false</IgnoreCase>
+		  </Condition>
+          <!--<Condition xsi:type="Not">
+			  <Argument xsi:type="Equals">
+				<Expression>$$com.sysprogs.efp.profiling.nosampling$$</Expression>
+				<ExpectedValue>1</ExpectedValue>
+				<IgnoreCase>false</IgnoreCase>
+			  </Argument>
+          </Condition>-->
+        </Arguments>
+      </ConditionToInclude>
+      <FilePath>$$SYS:EFP_BASE$$/Profiler/ProfilerDriver_RP2040.cpp</FilePath>
     </FileCondition>
 	</FileConditions>
 </EmbeddedFrameworkPackage>

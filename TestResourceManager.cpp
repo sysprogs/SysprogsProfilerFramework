@@ -292,7 +292,7 @@ ssize_t TRMWriteFileCached(TRMWriteBurstHandle hBurst, const void *pData, size_t
 	return WriteToFastSemihostingChannel(pdcResourceManagementStream, pData, size, 1);
 }
 
-#if FAST_SEMIHOSTING_STDIO_DRIVER
+#if FAST_SEMIHOSTING_STDIO_DRIVER && !defined(PROFILER_RP2040)
 
 #ifdef __IAR_SYSTEMS_ICC__
 extern "C" size_t __read(int fd, const unsigned char *pBuffer, size_t size)
