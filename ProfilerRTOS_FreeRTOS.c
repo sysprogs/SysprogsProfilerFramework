@@ -137,11 +137,17 @@ void __attribute__((noinline)) SysprogsRTOSHooks_FreeRTOS_traceQUEUE_RECEIVE_Act
 	}
 }
 
+static void __attribute__((noinline, naked)) ReferenceFreeRTOSSymbols()
+{
+	//This function should never be called and is only needed to make sure the needed FreeRTOS symbols get included in the final ELF file.
+	__asm volatile("bx lr");
+	__asm volatile("b xQueueGenericSendFromISR");
+	__asm volatile("b xQueueReceiveFromISR");
+}
+
 void InitializeProfilerRTOSHooks()
 {
 	volatile int x = 0;
-	extern void xQueueGenericSendFromISR();
-	extern void xQueueReceiveFromISR();
 	if (x)
 	{
 		SysprogsRTOSHooks_FreeRTOS_vTaskSwitchContext();
@@ -154,8 +160,7 @@ void InitializeProfilerRTOSHooks()
 		SysprogsRTOSHooks_FreeRTOS_traceQUEUE_SEND_Actual(0);
 		SysprogsRTOSHooks_FreeRTOS_traceQUEUE_RECEIVE_Actual(0);
 		SysprogsRTOSHooks_FreeRTOS_SchedulerStarting();
-		x = (int)&xQueueGenericSendFromISR;
-		x = (int)&xQueueReceiveFromISR;
+		ReferenceFreeRTOSSymbols();
 	}
 }
 
