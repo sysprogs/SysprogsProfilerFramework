@@ -32,6 +32,9 @@
 #elif defined(PROFILER_STM32H7) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32H7_Series)
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_tim.h>
+#elif defined(PROFILER_STM32H7_M4) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32H7_M4_Series)
+#include <stm32h7xx_hal.h>
+#include <stm32h7xx_hal_tim.h>
 #else
 #error No STM32 family specified
 #endif
