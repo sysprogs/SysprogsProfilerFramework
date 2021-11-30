@@ -19,6 +19,7 @@ static int stdio_fast_semihosting_in_chars(char *buf, int length)
 
 stdio_driver_t stdio_fast_semihosting = {
 	.out_chars = stdio_fast_semihosting_out_chars,
+	.out_flush = NULL,
 	.in_chars = stdio_fast_semihosting_in_chars,
 };
 
@@ -129,7 +130,7 @@ void SysprogsDebugger_RestorePIOOutputs(PIO pio)
 	g_DisconnectedPIOPins[index].Mask = 0;
 }
 
-static __attribute__((always_inline)) uint32_t __get_FAULTMASK(void)
+static __attribute__((always_inline)) inline uint32_t __get_FAULTMASK(void)
 {
 	uint32_t result;
 	asm volatile("MRS %0, faultmask"
