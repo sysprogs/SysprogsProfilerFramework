@@ -60,7 +60,7 @@ enum
 	kControlFastSemihostingPolling
 };
 
-#ifdef __ARMCC_VERSION
+#ifdef __CC_ARM
 static void __attribute__((noinline)) RunSemihostingCall(int r0, int r1)
 {
 	//ARMCC does not allow changing the r0/r1 values using the inline assembly syntax and instead redirects them to other registers.
@@ -80,7 +80,7 @@ void InitializeFastSemihosting()
 	asm volatile("mov r0, %0" :: "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting));
 	asm volatile("mov r1, %0" :: "r"(&s_FastSemihostingState));
 	asm volatile("bkpt 0xAB" :: : "r0", "r1", "r2", "r3", "lr", "memory", "cc");
-#elif defined(__ARMCC_VERSION)
+#elif defined(__CC_ARM)
 	RunSemihostingCall(SysprogsSemihostingReasonBase + kInitializeFastSemihosting, (int)&s_FastSemihostingState);
 #else
 	asm volatile("mov r0, %1; mov r1, %0; bkpt %a2" ::"r"(&s_FastSemihostingState), "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting), "i"(AngelSWI)
@@ -259,6 +259,16 @@ int _isatty()
 	return 1;
 }
 
+#ifdef __ARMCC_VERSION
+#include <stdio.h>
+extern "C" int fputc(int c, FILE *f)
+{
+    WriteToFastSemihostingChannel(0, &c, 1, FAST_SEMIHOSTING_BLOCKING_MODE);
+    return 0;
+}
+
+#else
+
 #ifdef __IAR_SYSTEMS_ICC__
 extern "C" size_t __write(int fd, const unsigned char *pBuffer, size_t size) 
 #else
@@ -270,6 +280,8 @@ int _write(int fd, char *pBuffer, int size)
 	//However if we are running the the non-blocking mode, we actually want to skip the extra data to avoid slowdown.
 	return size;
 }
+#endif
+
 #endif
 
 #if FAST_SEMIHOSTING_PROFILER_DRIVER
