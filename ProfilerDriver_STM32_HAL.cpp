@@ -77,7 +77,7 @@ static void UpdateProfilerTimerFrequency()
 	unsigned timerClockDividerEncoded;
 	//Somewhat dirty trick to determine whether the timer belongs to APB1 or APB2 based on the definition of __TIMxxx_CLK_DISABLE()
 #if defined(RCC_CFGR_PPRE1) && defined(RCC_CFGR_PPRE2)
-#ifdef PROFILER_STM32L4
+#if defined(PROFILER_STM32L4) || defined(PROFILER_STM32G4)
 	if (&CONCAT3(__TIM, SAMPLING_PROFILER_TIMER_INSTANCE, _CLK_DISABLE)() == &RCC->APB1ENR1)
 #else
 	if (&CONCAT3(__TIM, SAMPLING_PROFILER_TIMER_INSTANCE, _CLK_DISABLE)() == &RCC->APB1ENR)
