@@ -35,6 +35,15 @@
 #elif defined(PROFILER_STM32H7_M4) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32H7_M4_Series)
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_tim.h>
+#elif defined(PROFILER_STM32G0) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32G0_Series)
+#include <stm32g0xx_hal.h>
+#include <stm32g0xx_hal_tim.h>
+#elif defined(PROFILER_STM32G4) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32G4_Series)
+#include <stm32g4xx_hal.h>
+#include <stm32g4xx_hal_tim.h>
+#elif defined(PROFILER_STM32U5) || defined(PROFILER_com_sysprogs_generated_keil_family_STM32U5_Series)
+#include <stm32u5xx_hal.h>
+#include <stm32u5xx_hal_tim.h>
 #else
 #error No STM32 family specified
 #endif
