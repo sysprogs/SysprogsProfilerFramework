@@ -5,8 +5,6 @@
 
 #if defined(__ARMCC_VERSION) || defined(__IAR_SYSTEMS_ICC__)
 typedef int ssize_t;
-#else
-#include <memory.h>
 #endif
 
 #ifdef __cplusplus
