@@ -147,7 +147,7 @@ uint64_t TRMGetHostSystemTime();
 	\param mode Specifies the file open mode. See \ref SemihostingFileMode for a list of supported modes.
 	\return The function returns a file handle that can be used in calls to \ref TRMReadFile, \ref TRMWriteFile and other functions. If the function fails, the returned value will be 0. Use \ref TRMCloseFile to close the returned handle.
 */
-TRMFileHandle TRMCreateFile(const char *pFileName, SemihostingFileMode mode); //Returns 0 on failure.
+TRMFileHandle TRMCreateFile(const char *pFileName, enum SemihostingFileMode mode); //Returns 0 on failure.
 
 //! Closes a handle returned by \ref TRMCreateFile.
 void TRMCloseFile(TRMFileHandle hFile);
@@ -209,12 +209,12 @@ void TRMTruncateFile(TRMFileHandle hFile);
 //! Deletes a file.
 /*! This function deletes a file inside the TestResources folder of the current project. See \ref TRMCreateFile for the limitations on file paths.
 */
-TRMErrorCode TRMDeleteFile(const char *pFileName);
+enum TRMErrorCode TRMDeleteFile(const char *pFileName);
 
 //! Creates a subdirectory.
 /*! This function creates a subdirectory inside the TestResources folder of the current project. See \ref TRMCreateFile for the limitations on file paths.
 */
-TRMErrorCode TRMCreateDirectory(const char *pDirName);
+enum TRMErrorCode TRMCreateDirectory(const char *pDirName);
 
 //! Deletes a file.
 /*! This function deletes a directory inside the TestResources folder of the current project. See \ref TRMCreateFile for the limitations on file paths.
@@ -222,7 +222,7 @@ TRMErrorCode TRMCreateDirectory(const char *pDirName);
 	\param recursively Specify a non-zero value to delete the directory recursively. 
 	\remarks VisualGDB will automatically restrict all file API (including TRMDeleteDirectory) to the TestResources folder of the debugged project.
 */
-TRMErrorCode TRMDeleteDirectory(const char *pDirName, int recursively);
+enum TRMErrorCode TRMDeleteDirectory(const char *pDirName, int recursively);
 
 //! Starts a read burst.
 /*! This function starts a read burst (i.e. background prefetch) using the supplied temporary buffer. See \ref TRM_ReadBursts for more details.
@@ -239,7 +239,7 @@ TRMReadBurstHandle TRMBeginReadBurst(TRMFileHandle hFile, void *pWorkArea, size_
 
 //! Ends a read burst.
 /*! \param hBurst Burst handle returned by \ref TRMBeginReadBurst */
-TRMErrorCode TRMEndReadBurst(TRMReadBurstHandle hBurst);
+enum TRMErrorCode TRMEndReadBurst(TRMReadBurstHandle hBurst);
 
 //! Returns the pointer to a block of data that has been prefetched into the read burst buffer.
 /*! This function allows directly accessing the data that has been prefetched by VisualGDB into the burst buffer. Use \ref TRMEndReadFileCached to release the returned data
@@ -275,7 +275,7 @@ void *TRMBeginReadFileCached(TRMReadBurstHandle hBurst, size_t *pSize, int waitF
 	
 	\remarks After a buffer has been released by a call to TRMEndReadFileCached, you can immediately call \ref TRMBeginReadFileCached to read the next portion of data from the file.
 */
-TRMErrorCode TRMEndReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size);
+enum TRMErrorCode TRMEndReadFileCached(TRMReadBurstHandle hBurst, void *pBuffer, size_t size);
 
 //! Reads data within a read burst.
 /*! This function reads a portion of data within a read burst into the supplied buffer.
@@ -304,7 +304,7 @@ TRMWriteBurstHandle TRMBeginWriteBurst(TRMFileHandle hFile);
 
 //! Ends a write burst.
 /*! \param hBurst Burst handle returned by \ref TRMBeginWriteBurst */
-TRMErrorCode TRMEndWriteBurst(TRMWriteBurstHandle hBurst);
+enum TRMErrorCode TRMEndWriteBurst(TRMWriteBurstHandle hBurst);
 
 //! Writes data within a write burst.
 /*! This function writes data to a file on the host within a write burst. As long as the fast semihosting buffer has sufficient space, the function will return immediately,
