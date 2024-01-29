@@ -197,7 +197,7 @@ int SysprogsDebugger_StepPIOs(PIO pio, int mask, int stepCount, int overrideMask
 
 		//If some input pins change value between a PIO step and our sampling of their values, the user would see inconsistent results.
 		//To avoid it, we capture the pin values before doing the step, and freeze them via the GPIO override registers until the step is complete.
-		for (int pin = 0; pin < 32; pin++)
+		for (int pin = 0; pin < NUM_BANK0_GPIOS; pin++)
 		{
 			bool isHigh = effectiveInputValues & (1 << pin);
 
@@ -214,7 +214,7 @@ int SysprogsDebugger_StepPIOs(PIO pio, int mask, int stepCount, int overrideMask
 		SysprogsDebugger_DoStepPIOs(pio, mask);
 		SysprogsDebugger_SavePIOStateToBuffer(pio, mask, pioHasPinOverrides, effectiveInputValues);
 
-		for (int pin = 0; pin < 32; pin++)
+		for (int pin = 0; pin < NUM_BANK0_GPIOS; pin++)
 			iobank0_hw->io[pin].ctrl &= ~IO_BANK0_GPIO0_CTRL_INOVER_BITS;
 	}
 
