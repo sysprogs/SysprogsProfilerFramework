@@ -189,6 +189,16 @@ namespace SysprogsInstrumentingProfiler
 			{
 				sd_nvic_critical_region_exit(m_Nested);
 			}
+#else
+		public:
+			// Empty constructor and deconstructor are needed to suppress "Unused variable" warning
+			VendorSpecificInterruptHolderRAII()
+			{
+			}
+
+			~VendorSpecificInterruptHolderRAII()
+			{
+			}
 #endif
 		};
 	} // namespace VendorSpecificWorkarounds
@@ -646,8 +656,8 @@ extern "C" __attribute__((naked)) void SysprogsStackVerifierHook()
 	asm("ldr r0, =_ZN21SysprogsStackVerifier10StackLimitE");
 	asm("ldr r0, [r0]");
 	asm("add r0, r1");
-	asm("cmp r0, sp");
-	asm("bls StackVerifierHook_Exit");
+	asm("cmp sp, r0");
+	asm("bhi StackVerifierHook_Exit");
 	asm("ldr r0, [sp, #4]");
 	asm("mov lr, r0");
 	asm("ldr r0, [sp, #12]");

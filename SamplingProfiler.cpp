@@ -238,7 +238,10 @@ extern "C" void SysprogsProfiler_ProcessSample(void *PC, void *SP, void *FP, voi
 			}
 
 			if (newRate > 100 && newRate < 100000)
-				g_SamplingProfilerRate = g_SamplingProfilerAutoRate = newRate;
+			{
+				g_SamplingProfilerAutoRate = newRate;
+				g_SamplingProfilerRate = newRate;
+			}
 		}
 		s_PacketsDropped = 0;
 		s_PacketsInCycle = 0;
