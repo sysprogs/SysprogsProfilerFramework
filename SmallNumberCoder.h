@@ -278,11 +278,13 @@ private:
 private:
 	static int SignExtend(int value, unsigned bits)
 	{
-		unsigned signbit = 1u << (bits - 1);
-		unsigned signpad = (~(unsigned)0) << bits;
-		return (value & signbit) ? (value | signpad) : value;
+		unsigned signBitShiftedToLSB = (unsigned)value >> (bits - 1);
+		unsigned signBitCopiedToAllBits  = ~((signBitShiftedToLSB & 1) - 1);
+		unsigned signBitShiftedToPaddingBits  = signBitCopiedToAllBits << bits;
+		
+		return (int)(signBitShiftedToPaddingBits | (unsigned)value);
 	}
-
+	
 	inline unsigned PeekInt32(int delta = 0)
 	{
 		int offset = m_Offset + delta;
