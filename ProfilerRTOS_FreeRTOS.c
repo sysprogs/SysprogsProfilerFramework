@@ -4,7 +4,7 @@
 #include "SysprogsProfilerInterface.h"
 
 //Using those macros in conjunction with the <DebugInfoBinding> tag allows accessing fields of private structures not exposed via FreeRTOS headers.
-#define DELAYED_STRUCT_MEMBER_OFFSET(struct, member) const volatile int __attribute__((section(".text." #struct "_" #member "_Offset"))) struct##_##member##_Offset;
+#define DELAYED_STRUCT_MEMBER_OFFSET(struct, member) const volatile int __attribute__((section(".text." #struct "_" #member "_Offset"))) struct##_##member##_Offset
 #define STRUCT_MEMBER(ptr, result_type, structType, member) (*((result_type *)((char *)ptr + structType##_##member##_Offset)))
 
 DELAYED_STRUCT_MEMBER_OFFSET(tskTaskControlBlock, pcTaskName);
@@ -93,15 +93,17 @@ struct
 
 void __attribute__((noinline, optimize("-O0"))) SysprogsRTOSHooks_FreeRTOS_traceQUEUE_SEND(void *pQueue)
 {
+	(void)pQueue;
 	__asm("nop");
 }
 
 void __attribute__((noinline, optimize("-O0"))) SysprogsRTOSHooks_FreeRTOS_traceQUEUE_RECEIVE(void *pQueue)
 {
+	(void)pQueue;
 	__asm("nop");
 }
 
-void __attribute__((noinline, optimize("-O0"))) SysprogsRTOSHooks_FreeRTOS_SchedulerStarting()
+void __attribute__((noinline, optimize("-O0"))) SysprogsRTOSHooks_FreeRTOS_SchedulerStarting(void)
 {
 	__asm("bkpt 255"); //When this breakpoint triggers, VisualGDB will automatically reparse real-time watch expressions that could not be parsed before
 	vTaskStartScheduler();

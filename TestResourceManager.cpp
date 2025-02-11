@@ -300,6 +300,7 @@ extern "C" size_t __read(int fd, const unsigned char *pBuffer, size_t size)
 extern "C" int _read(int fd, char *pBuffer, int size)
 #endif
 {
+	(void)fd;
 	return TRMReadStdin((void *)pBuffer, size, 1);
 }
 #endif

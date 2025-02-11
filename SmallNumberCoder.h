@@ -10,16 +10,15 @@ private:
 	void *m_RefPointA, *m_RefPointB;
 
 private:
-	static inline int IsSignedIntConstrained(int value, int bits)
+	static inline int IsSignedIntConstrained(int value, unsigned bits)
 	{
-		int mask = -1 << bits;
-		int refVal = ~(((value >> (bits - 1)) & 1) - 1);
-		return (value & mask) == (refVal & mask);
+		unsigned mask = (~(unsigned)0) << (bits - 1);
+		return ((value & mask) == 0) || ((value & mask) == mask);
 	}
 
-	static inline int IsUnsignedIntConstrained(unsigned value, int bits)
+	static inline int IsUnsignedIntConstrained(unsigned value, unsigned bits)
 	{
-		int mask = -1 << bits;
+		unsigned mask = (~(unsigned)0) << bits;
 		return (value & mask) == 0;
 	}
 
@@ -107,7 +106,7 @@ public:
 
 	inline bool WriteSmallMostLikelyEvenSInt(int value)
 	{
-		int signBit = (value >> 31) & 1;
+		int signBit = (value & 0x80000000) >> 31;
 		int permutatedValue = (int)((value & 0xffff0000) | ((value & 0xffff) >> 1) | (((value & 1) ^ signBit) << 15));
 
 		if (IsSignedIntConstrained(permutatedValue, 15))
@@ -277,9 +276,11 @@ private:
 	char *m_RefPointA, *m_RefPointB;
 
 private:
-	static int SignExtend(int value, int bits)
+	static int SignExtend(int value, unsigned bits)
 	{
-		return ((~(((value >> (bits - 1)) & 1) - 1)) << bits) | value;
+		unsigned signbit = 1u << (bits - 1);
+		unsigned signpad = (~(unsigned)0) << bits;
+		return (value & signbit) ? (value | signpad) : value;
 	}
 
 	inline unsigned PeekInt32(int delta = 0)
@@ -388,7 +389,7 @@ public:
 			m_Offset += 5;
 		}
 
-		int signBit = (permutatedValue >> 31) & 1;
+		int signBit = (permutatedValue & 0x80000000) >> 31;
 		*pValue = (int)(((unsigned)permutatedValue & 0xffff0000) | ((((unsigned)permutatedValue & 0x8000) >> 15) ^ signBit) | (((unsigned)permutatedValue & 0x7fff) << 1));
 		return true;
 	}
