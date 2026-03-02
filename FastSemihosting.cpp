@@ -57,35 +57,37 @@ static const int SysprogsSemihostingReasonBase = 0x50535953; //'SYSP';
 enum
 {
 	kInitializeFastSemihosting,
-	kControlFastSemihostingPolling
+	kControlFastSemihostingPolling,
+	kInitializeFastSemihostingV2,		//Fixes race condition with initialization vs. reset
 };
 
-#ifdef __CC_ARM
-static void __attribute__((noinline)) RunSemihostingCall(int r0, int r1)
-{
-	//ARMCC does not allow changing the r0/r1 values using the inline assembly syntax and instead redirects them to other registers.
-	//Moving the semihosting call to a separate function solves the problem.
-	__asm("bkpt 0xab");
-}
+#ifdef __IAR_SYSTEMS_ICC__ 
+#pragma inline=never
+__stackless static void  RunSemihostingCall(void *r0, void *r1, void *r2, void * r3)
+#else
+static void __attribute__((noinline, naked)) RunSemihostingCall(void *r0, void *r1, void *r2, void * r3)
 #endif
+{
+	__asm("bkpt 0xab");
+	__asm("bx lr");
+}
 
 void InitializeFastSemihosting()
 {
 	s_FastSemihostingInitialized = true;
 
-	void *pSemihostingStruct = &s_FastSemihostingState;
-	(void)pSemihostingStruct;
-	s_FastSemihostingState.ReadOffset = sizeof(s_FastSemihostingState.Data);
-#ifdef __IAR_SYSTEMS_ICC__
-	asm volatile("mov r0, %0" :: "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting));
-	asm volatile("mov r1, %0" :: "r"(&s_FastSemihostingState));
-	asm volatile("bkpt 0xAB" :: : "r0", "r1", "r2", "r3", "lr", "memory", "cc");
-#elif defined(__CC_ARM)
-	RunSemihostingCall(SysprogsSemihostingReasonBase + kInitializeFastSemihosting, (int)&s_FastSemihostingState);
-#else
-	asm volatile("mov r0, %1; mov r1, %0; bkpt %a2" ::"r"(&s_FastSemihostingState), "r"(SysprogsSemihostingReasonBase + kInitializeFastSemihosting), "i"(AngelSWI)
-				 : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc");
-#endif
+	/* The old way of reporting sizeof(Data) via the ReadOffset field causes a race condition during reset:
+	 *	1. A system reset is triggered and this function gets called.
+	 *	2. The reading thread on the VisualGDB side processes pre-reset data and updates ReadOffset.
+	 *	3. VisualGDB gets to process the semihosting call with the incorrect ReadOffset value
+	 *	
+	 * Passing the size via the R2 register instead is not affected by any background memory operations.
+	*/
+	RunSemihostingCall((void *)(SysprogsSemihostingReasonBase + kInitializeFastSemihostingV2),
+					   &s_FastSemihostingState,
+					   (void *)sizeof(s_FastSemihostingState.Data),
+					   (void *)0);
+	
 	s_FastSemihostingState.ReadOffset = 0;
 	s_FastSemihostingState.WriteOffset = 0;
 }
