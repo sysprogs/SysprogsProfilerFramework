@@ -85,7 +85,7 @@ unsigned g_PIOStateBufferOffset;
 void SysprogsDebugger_SavePIOOutputs(PIO pio)
 {
 	int index = pio == pio1;
-	gpio_function pioFunc = index ? GPIO_FUNC_PIO1 : GPIO_FUNC_PIO0;
+	gpio_function_t pioFunc = index ? GPIO_FUNC_PIO1 : GPIO_FUNC_PIO0;
 	unsigned mask = 0;
 
 	for (int i = 0; i < GPIO_CHANNELS_TO_SAVE; i++)
